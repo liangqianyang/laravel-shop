@@ -6,7 +6,11 @@
  * Time: 9:51
  */
 
-function test_helper()
+/**
+ * 将当前请求的路由名称转换为CSS类名称
+ * @return mixed
+ */
+function route_class()
 {
-    return 'OK';
+    return str_replace('.', '-', Route::currentRouteName());
 }
