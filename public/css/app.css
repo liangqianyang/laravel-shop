@@ -10700,6 +10700,10 @@ body {
 
 /*商品列表页*/
 
+.products-index-page {
+  /*搜索*/
+}
+
 .products-index-page .pagination {
   margin-right: 5px;
 }
@@ -10773,5 +10777,11 @@ body {
 
 .products-index-page .products-list .product-item .product-content .bottom > div:first-child {
   border-right: 1px solid #eee;
+}
+
+.products-index-page .search-form {
+  padding: 0 5px 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #eee;
 }
 
