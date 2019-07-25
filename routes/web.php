@@ -11,8 +11,8 @@
 |
 */
 
-Route::get('/', 'PagesController@root')->name('root');//主页
-
+Route::redirect('/', '/products')->name('root');
+Route::get('products', 'ProductsController@index')->name('products.index');
 Auth::routes();
 
 // auth 中间件代表需要登录，verified中间件代表需要经过邮箱验证
@@ -23,5 +23,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('user_addresses/{user_address}', 'UserAddressesController@edit')->name('user_addresses.edit');//编辑收货地址的页面
     Route::put('user_addresses/{user_address}', 'UserAddressesController@update')->name('user_addresses.update');//更新数据
     Route::delete('user_addresses/{user_address}', 'UserAddressesController@destroy')->name('user_addresses.destroy');//删除收货地址
+
 });
 
