@@ -12,7 +12,8 @@
 */
 
 Route::redirect('/', '/products')->name('root');
-Route::get('products', 'ProductsController@index')->name('products.index');
+Route::get('products', 'ProductsController@index')->name('products.index');//商品列表页
+Route::get('products/{product}', 'ProductsController@show')->name('products.show');//商品详情页
 Auth::routes();
 
 // auth 中间件代表需要登录，verified中间件代表需要经过邮箱验证
