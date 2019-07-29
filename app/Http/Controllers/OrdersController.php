@@ -14,7 +14,13 @@ use Illuminate\Http\Request;
 class OrdersController extends Controller
 {
 
-    public function index(Request $request){
+    /**
+     * 订单列表页
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\think\response\View
+     */
+    public function index(Request $request)
+    {
         $orders = Order::query()
             // 使用 with 方法预加载，避免N + 1问题
             ->with(['items.product', 'items.productSku'])
@@ -87,5 +93,21 @@ class OrdersController extends Controller
         });
         $this->dispatch(new CloseOrder($order, config('app.order_ttl')));
         return $order;
+    }
+
+
+    /**
+     * 订单详情页
+     * @param Order $order
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|\think\response\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
+    public function show(Order $order, Request $request)
+    {
+        $this->authorize('own', $order);
+
+        return view('orders.show', ['order' => $order->load(['items.productSku', 'items.product'])]);
+
     }
 }
