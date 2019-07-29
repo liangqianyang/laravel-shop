@@ -130,4 +130,13 @@ class Order extends Model
 
         return $no;
     }
+
+    /**
+     * 关联优惠券
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function couponCode()
+    {
+        return $this->belongsTo(CouponCode::class);
+    }
 }
