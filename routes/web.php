@@ -13,8 +13,9 @@
 
 Route::redirect('/', '/products')->name('root');
 Route::get('products', 'ProductsController@index')->name('products.index');//商品列表页
+Route::get('products/{product}', 'ProductsController@show')->name('products.show');//商品详情页
 
-Auth::routes();
+Auth::routes();//登陆,注册
 
 // auth 中间件代表需要登录，verified中间件代表需要经过邮箱验证
 Route::group(['middleware' => ['auth']], function () {
@@ -33,13 +34,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('orders', 'OrdersController@store')->name('orders.store');//提交订单
     Route::get('orders', 'OrdersController@index')->name('orders.index');//订单列表
     Route::get('orders/{order}', 'OrdersController@show')->name('orders.show');//订单详情页
+    Route::get('payment/{order}/alipay', 'PaymentController@payByAlipay')->name('payment.alipay');//支付宝支付
+    Route::get('payment/alipay/return', 'PaymentController@alipayReturn')->name('payment.alipay.return');//支付宝支付前端回调
 });
+Route::post('payment/alipay/notify', 'PaymentController@alipayNotify')->name('payment.alipay.notify');//支付宝支付后端回调
 
-Route::get('products/{product}', 'ProductsController@show')->name('products.show');//商品详情页
-Route::get('alipay', function() {
-    return app('alipay')->web([
-        'out_trade_no' => time(),
-        'total_amount' => '1',
-        'subject' => 'test subject - 测试',
-    ]);
-});
+
