@@ -101,13 +101,19 @@
                                        href="{{ route('payment.alipay', ['order' => $order->id]) }}">支付宝支付</a>
                                 </div>
                             @endif
-                        <!-- 支付按钮结束 -->
+                            <!-- 支付按钮结束 -->
 
                             <!-- 如果订单的发货状态为已发货则展示确认收货按钮 -->
                             @if($order->ship_status === \App\Models\Order::SHIP_STATUS_DELIVERED)
                                 <div class="receive-button">
                                     <!-- 将原本的表单替换成下面这个按钮 -->
                                     <button type="button" id="btn-receive" class="btn btn-sm btn-success">确认收货</button>
+                                </div>
+                            @endif
+                            <!-- 订单已支付，且退款状态是未退款时展示申请退款按钮 -->
+                            @if($order->paid_at && $order->refund_status === \App\Models\Order::REFUND_STATUS_PENDING)
+                                <div class="refund-button">
+                                    <button class="btn btn-sm btn-danger" id="btn-apply-refund">申请退款</button>
                                 </div>
                             @endif
                         </div>
@@ -141,6 +147,28 @@
                                 location.reload();
                             })
                     });
+            });
+
+            // 退款按钮点击事件
+            $('#btn-apply-refund').click(function () {
+                swal({
+                    text: '请输入退款理由',
+                    content: "input",
+                }).then(function (input) {
+                    // 当用户点击 swal 弹出框上的按钮时触发这个函数
+                    if(!input) {
+                        swal('退款理由不可空', '', 'error');
+                        return;
+                    }
+                    // 请求退款接口
+                    axios.post('{{ route('orders.apply_refund', [$order->id]) }}', {reason: input})
+                        .then(function () {
+                            swal('申请退款成功', '', 'success').then(function () {
+                                // 用户点击弹框上按钮时重新加载页面
+                                location.reload();
+                            });
+                        });
+                });
             });
 
         });

@@ -39,6 +39,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('orders/{order}/received', 'OrdersController@received')->name('orders.received');//确认收货
     Route::get('orders/{order}/review', 'OrdersController@review')->name('orders.review.show');//评价页面
     Route::post('orders/{order}/review', 'OrdersController@sendReview')->name('orders.review.store');//评价订单
+    Route::post('orders/{order}/apply_refund', 'OrdersController@applyRefund')->name('orders.apply_refund');//退款申请
 });
 Route::post('payment/alipay/notify', 'PaymentController@alipayNotify')->name('payment.alipay.notify');//支付宝支付后端回调
 
