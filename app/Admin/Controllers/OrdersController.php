@@ -79,7 +79,7 @@ class OrdersController extends Controller
         $grid = new Grid(new Order);
 
         // 只展示已支付的订单，并且默认按支付时间倒序排序
-        $grid->model()->whereNotNull('paid_at')->orderBy('paid_at', 'desc');
+        $grid->model()->whereNotNull('paid_at')->orderBy('created_at','desc')->orderBy('paid_at', 'desc');
         $grid->no('订单流水号');
         // 展示关联关系的字段时，使用 column 方法
         $grid->column('user.name', '买家');
