@@ -85,7 +85,9 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <button type="button" class="btn btn-success" id="btn-check-coupon">检查</button>
-                                    <button type="button" class="btn btn-danger" style="display: none;" id="btn-cancel-coupon">取消</button>
+                                    <button type="button" class="btn btn-danger" style="display: none;"
+                                            id="btn-cancel-coupon">取消
+                                    </button>
                                 </div>
                             </div>
                             <!-- 优惠码结束 -->
@@ -151,6 +153,8 @@
                             });
                             html += '</div>';
                             swal({content: $(html)[0], icon: 'error'})
+                        } else if (error.response.status === 403) { // 这里判断状态 403
+                            swal(error.response.data.msg, '', 'error');
                         } else {
                             // 其他情况应该是系统挂了
                             swal('系统错误', '', 'error');
@@ -200,7 +204,7 @@
                 // 获取用户输入的优惠码
                 var code = $('input[name=coupon_code]').val();
                 // 如果没有输入则弹框提示
-                if(!code) {
+                if (!code) {
                     swal('请输入优惠码', '', 'warning');
                     return;
                 }
@@ -213,7 +217,7 @@
                         $('#btn-check-coupon').hide(); // 隐藏 检查 按钮
                     }, function (error) {
                         // 如果返回码是 404，说明优惠券不存在
-                        if(error.response.status === 404) {
+                        if (error.response.status === 404) {
                             swal('优惠码不存在', '', 'error');
                         } else if (error.response.status === 403) {
                             // 如果返回码是 403，说明有其他条件不满足

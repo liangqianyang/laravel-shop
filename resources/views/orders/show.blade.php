@@ -74,6 +74,15 @@
                             @endif
                         </div>
                         <div class="order-summary text-right">
+                            <!-- 展示优惠信息开始 -->
+                            @if($order->couponCode)
+                                <div class="text-primary">
+                                    <span>优惠信息：</span>
+                                    <div class="value">{{ $order->couponCode->description }}</div>
+                                </div>
+                            @endif
+                            <!-- 展示优惠信息结束 -->
+
                             <div class="total-amount">
                                 <span>订单总价：</span>
                                 <div class="value">￥{{ $order->total_amount }}</div>
@@ -101,14 +110,14 @@
                                     <div class="value">{{ $order->extra['refund_disagree_reason'] }}</div>
                                 </div>
                             @endif
-                            <!-- 支付按钮开始 -->
+                        <!-- 支付按钮开始 -->
                             @if(!$order->paid_at && !$order->closed)
                                 <div class="payment-buttons">
                                     <a class="btn btn-primary btn-sm"
                                        href="{{ route('payment.alipay', ['order' => $order->id]) }}">支付宝支付</a>
                                 </div>
                             @endif
-                            <!-- 支付按钮结束 -->
+                        <!-- 支付按钮结束 -->
 
                             <!-- 如果订单的发货状态为已发货则展示确认收货按钮 -->
                             @if($order->ship_status === \App\Models\Order::SHIP_STATUS_DELIVERED)
@@ -117,7 +126,7 @@
                                     <button type="button" id="btn-receive" class="btn btn-sm btn-success">确认收货</button>
                                 </div>
                             @endif
-                            <!-- 订单已支付，且退款状态是未退款时展示申请退款按钮 -->
+                        <!-- 订单已支付，且退款状态是未退款时展示申请退款按钮 -->
                             @if($order->paid_at && $order->refund_status === \App\Models\Order::REFUND_STATUS_PENDING)
                                 <div class="refund-button">
                                     <button class="btn btn-sm btn-danger" id="btn-apply-refund">申请退款</button>
@@ -163,7 +172,7 @@
                     content: "input",
                 }).then(function (input) {
                     // 当用户点击 swal 弹出框上的按钮时触发这个函数
-                    if(!input) {
+                    if (!input) {
                         swal('退款理由不可空', '', 'error');
                         return;
                     }
