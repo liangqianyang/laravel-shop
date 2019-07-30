@@ -13,7 +13,6 @@
 
 Route::redirect('/', '/products')->name('root');
 Route::get('products', 'ProductsController@index')->name('products.index');//商品列表页
-Route::get('products/{product}', 'ProductsController@show')->name('products.show');//商品详情页
 
 Auth::routes();//登陆,注册
 
@@ -42,6 +41,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('orders/{order}/apply_refund', 'OrdersController@applyRefund')->name('orders.apply_refund');//退款申请
     Route::get('coupon_codes/{code}', 'CouponCodesController@show')->name('coupon_codes.show');//检查优惠券信息
 });
+Route::get('products/{product}', 'ProductsController@show')->name('products.show');//商品详情页
 Route::post('payment/alipay/notify', 'PaymentController@alipayNotify')->name('payment.alipay.notify');//支付宝支付后端回调
 
 
