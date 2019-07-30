@@ -27,4 +27,11 @@ Route::group([
     $router->get('coupon_codes/{id}/edit', 'CouponCodesController@edit');//编辑优惠券的页面
     $router->put('coupon_codes/{id}', 'CouponCodesController@update');//更新优惠券的页面
     $router->delete('coupon_codes/{id}', 'CouponCodesController@destroy');//删除优惠券
+    $router->get('categories', 'CategoriesController@index');//类目列表
+    $router->get('categories/create', 'CategoriesController@create');//创建类目的页面
+    $router->get('categories/{id}/edit', 'CategoriesController@edit');//编辑类目的页面
+    $router->post('categories', 'CategoriesController@store');//创建类目
+    $router->put('categories/{id}', 'CategoriesController@update');//更新类目
+    $router->delete('categories/{id}', 'CategoriesController@destroy');//删除类目
+    $router->get('api/categories', 'CategoriesController@apiIndex');//搜索类目
 });
