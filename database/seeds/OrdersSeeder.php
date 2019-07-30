@@ -7,10 +7,6 @@ use Illuminate\Database\Seeder;
 
 class OrdersSeeder extends Seeder
 {
-
-    /**
-     * @throws Exception
-     */
     public function run()
     {
         // 获取 Faker 实例
