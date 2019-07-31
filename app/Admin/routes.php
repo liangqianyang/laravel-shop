@@ -34,4 +34,9 @@ Route::group([
     $router->put('categories/{id}', 'CategoriesController@update');//更新类目
     $router->delete('categories/{id}', 'CategoriesController@destroy');//删除类目
     $router->get('api/categories', 'CategoriesController@apiIndex');//搜索类目
+    $router->get('crowdfunding_products', 'CrowdfundingProductsController@index');//众筹列表
+    $router->get('crowdfunding_products/create', 'CrowdfundingProductsController@create');//创建众筹页面
+    $router->post('crowdfunding_products', 'CrowdfundingProductsController@store');//新增众筹
+    $router->get('crowdfunding_products/{id}/edit', 'CrowdfundingProductsController@edit');//编辑众筹页面
+    $router->put('crowdfunding_products/{id}', 'CrowdfundingProductsController@update');//更新众筹数据
 });
