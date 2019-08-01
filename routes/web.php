@@ -50,5 +50,6 @@ Route::group(['middleware' => ['auth']], function () {
 });
 Route::post('payment/alipay/notify', 'PaymentController@alipayNotify')->name('payment.alipay.notify');//支付宝支付后端回调
 Route::post('installments/alipay/notify', 'InstallmentsController@alipayNotify')->name('installments.alipay.notify');//分期支付支付宝支付后端回调
+Route::post('installments/wechat/refund_notify', 'InstallmentsController@wechatRefundNotify')->name('installments.wechat.refund_notify');//微信退款回调
 
 
