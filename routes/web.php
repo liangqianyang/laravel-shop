@@ -45,7 +45,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('payment/{order}/installment', 'PaymentController@payByInstallment')->name('payment.installment');//分期付款
     Route::get('installments', 'InstallmentsController@index')->name('installments.index');//分期付款列表
     Route::get('installments/{installment}', 'InstallmentsController@show')->name('installments.show');//分期付款详情页
+    Route::get('installments/{installment}/alipay', 'InstallmentsController@payByAlipay')->name('installments.alipay');//分期支付支付宝支付
+    Route::get('installments/alipay/return', 'InstallmentsController@alipayReturn')->name('installments.alipay.return');//分期支付前端支付宝回调
 });
 Route::post('payment/alipay/notify', 'PaymentController@alipayNotify')->name('payment.alipay.notify');//支付宝支付后端回调
+Route::post('installments/alipay/notify', 'InstallmentsController@alipayNotify')->name('installments.alipay.notify');//分期支付支付宝支付后端回调
 
 
