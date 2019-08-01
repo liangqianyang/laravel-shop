@@ -42,6 +42,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('orders/{order}/apply_refund', 'OrdersController@applyRefund')->name('orders.apply_refund');//退款申请
     Route::get('coupon_codes/{code}', 'CouponCodesController@show')->name('coupon_codes.show');//检查优惠券信息
     Route::post('crowdfunding_orders', 'OrdersController@crowdfunding')->name('crowdfunding_orders.store');//众筹商品下单
+    Route::post('payment/{order}/installment', 'PaymentController@payByInstallment')->name('payment.installment');//分期付款
 });
 Route::post('payment/alipay/notify', 'PaymentController@alipayNotify')->name('payment.alipay.notify');//支付宝支付后端回调
 
