@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Jobs\SyncOneProductToES;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Encore\Admin\Controllers\HasResourceActions;
@@ -62,6 +63,9 @@ abstract class CommonProductsController extends Controller
     // 定义一个抽象方法，各个类型的控制器将实现本方法来定义列表应该展示哪些字段
     abstract protected function customGrid(Grid $grid);
 
+    /**
+     * @return Form
+     */
     protected function form()
     {
         $form = new Form(new Product());
@@ -100,6 +104,10 @@ abstract class CommonProductsController extends Controller
             $form->model()->price = collect($form->input('skus'))->where(Form::REMOVE_FLAG_NAME, 0)->min('price') ?: 0;
         });
 
+        $form->saved(function (Form $form) {
+            $product = $form->model();
+            $this->dispatch(new SyncOneProductToES($product));
+        });
         return $form;
     }
 
