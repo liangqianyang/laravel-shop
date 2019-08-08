@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Exceptions\InvalidRequestException;
 use App\Http\Controllers\Controller;
+use App\Models\CrowdfundingProduct;
 use App\Models\Order;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
@@ -13,7 +14,7 @@ use Encore\Admin\Show;
 use Illuminate\Http\Request;
 use App\Http\Requests\Admin\HandleRefundRequest;
 use App\Exceptions\InternalException;
-
+use App\Services\OrderService;
 class OrdersController extends Controller
 {
     use HasResourceActions;
@@ -79,7 +80,7 @@ class OrdersController extends Controller
         $grid = new Grid(new Order);
 
         // 只展示已支付的订单，并且默认按支付时间倒序排序
-        $grid->model()->whereNotNull('paid_at')->orderBy('paid_at', 'desc');
+        $grid->model()->whereNotNull('paid_at')->orderBy('created_at','desc')->orderBy('paid_at', 'desc');
         $grid->no('订单流水号');
         // 展示关联关系的字段时，使用 column 方法
         $grid->column('user.name', '买家');
@@ -176,6 +177,13 @@ class OrdersController extends Controller
         if ($order->ship_status !== Order::SHIP_STATUS_PENDING) {
             throw new InvalidRequestException('该订单已发货');
         }
+
+        // 众筹订单只有在众筹成功之后发货
+        if ($order->type === Order::TYPE_CROWDFUNDING &&
+            $order->items[0]->product->crowdfunding->status !== CrowdfundingProduct::STATUS_SUCCESS) {
+            throw new InvalidRequestException('众筹订单只能在众筹成功之后发货');
+        }
+
         // Laravel 5.5 之后 validate 方法可以返回校验过的值
         $data = $this->validate($request, [
             'express_company' => ['required'],
@@ -201,11 +209,12 @@ class OrdersController extends Controller
      * 处理退款
      * @param Order $order
      * @param HandleRefundRequest $request
+     * @param OrderService $orderService
      * @return Order
      * @throws InternalException
      * @throws InvalidRequestException
      */
-    public function handleRefund(Order $order, HandleRefundRequest $request)
+    public function handleRefund(Order $order, HandleRefundRequest $request,OrderService $orderService)
     {
         // 判断订单状态是否正确
         if ($order->refund_status !== Order::REFUND_STATUS_APPLIED) {
@@ -220,7 +229,8 @@ class OrdersController extends Controller
                 'extra' => $extra,
             ]);
             // 调用退款逻辑
-            $this->_refundOrder($order);
+            // 改为调用封装的方法
+            $orderService->refundOrder($order);
         } else {
             // 将拒绝退款理由放到订单的 extra 字段中
             $extra = $order->extra ?: [];
@@ -233,53 +243,5 @@ class OrdersController extends Controller
         }
 
         return $order;
-    }
-
-    /**
-     * 退款
-     * @param Order $order
-     * @throws InternalException
-     */
-    protected function _refundOrder(Order $order)
-    {
-        // 判断该订单的支付方式
-        switch ($order->payment_method) {
-            case 'wechat':
-                // 微信的先留空
-                // todo
-                break;
-            case 'alipay':
-                // 用我们刚刚写的方法来生成一个退款订单号
-                $refundNo = Order::getAvailableRefundNo();
-                // 调用支付宝支付实例的 refund 方法
-                $ret = app('alipay')->refund([
-                    'out_trade_no' => $order->no, // 之前的订单流水号
-                    'refund_amount' => $order->total_amount, // 退款金额，单位元
-                    'out_request_no' => $refundNo, // 退款订单号
-                ]);
-                // 根据支付宝的文档，如果返回值里有 sub_code 字段说明退款失败
-                if ($ret->sub_code) {
-                    // 将退款失败的保存存入 extra 字段
-                    $extra = $order->extra;
-                    $extra['refund_failed_code'] = $ret->sub_code;
-                    // 将订单的退款状态标记为退款失败
-                    $order->update([
-                        'refund_no' => $refundNo,
-                        'refund_status' => Order::REFUND_STATUS_FAILED,
-                        'extra' => $extra,
-                    ]);
-                } else {
-                    // 将订单的退款状态标记为退款成功并保存退款订单号
-                    $order->update([
-                        'refund_no' => $refundNo,
-                        'refund_status' => Order::REFUND_STATUS_SUCCESS,
-                    ]);
-                }
-                break;
-            default:
-                // 原则上不可能出现，这个只是为了代码健壮性
-                throw new InternalException('未知订单支付方式：' . $order->payment_method);
-                break;
-        }
     }
 }

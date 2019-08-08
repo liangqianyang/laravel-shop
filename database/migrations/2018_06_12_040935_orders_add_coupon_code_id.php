@@ -6,24 +6,14 @@ use Illuminate\Database\Migrations\Migration;
 
 class OrdersAddCouponCodeId extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->unsignedBigInteger('coupon_code_id')->nullable()->after('paid_at');
+            $table->unsignedInteger('coupon_code_id')->nullable()->after('paid_at');
             $table->foreign('coupon_code_id')->references('id')->on('coupon_codes')->onDelete('set null');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::table('orders', function (Blueprint $table) {
