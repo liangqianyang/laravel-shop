@@ -200,4 +200,54 @@ class OrderService
                 break;
         }
     }
+
+    /**
+     * 秒杀
+     * @param User $user
+     * @param array $addressData
+     * @param ProductSku $sku
+     * @return mixed
+     * @throws \Throwable
+     */
+    public function seckill(User $user, array $addressData, ProductSku $sku)
+    {
+        $order = \DB::transaction(function () use ($user, $addressData, $sku) {
+
+            // 将之前的更新收货地址的最后使用时间代码删除
+            $order = new Order([
+                'address' => [ // address 字段直接从 $addressData 数组中读取
+                    'address' => $addressData['province'] . $addressData['city'] . $addressData['district'] . $addressData['address'],
+                    'zip' => $addressData['zip'],
+                    'contact_name' => $addressData['contact_name'],
+                    'contact_phone' => $addressData['contact_phone'],
+                ],
+                'remark' => '',
+                'total_amount' => $sku->price,
+                'type' => Order::TYPE_SECKILL,
+            ]);
+            // 订单关联到当前用户
+            $order->user()->associate($user);
+            // 写入数据库
+            $order->save();
+            // 创建一个新的订单项并与 SKU 关联
+            $item = $order->items()->make([
+                'amount' => 1, // 秒杀商品只能一份
+                'price' => $sku->price,
+            ]);
+            $item->product()->associate($sku->product_id);
+            $item->productSku()->associate($sku);
+            $item->save();
+            // 扣减对应 SKU 库存
+            if ($sku->decreaseStock(1) <= 0) {
+                throw new InvalidRequestException('该商品库存不足');
+            }
+
+            \Redis::decr('seckill_sku_'.$sku->id);
+            return $order;
+        });
+        // 秒杀订单的自动关闭时间与普通订单不同
+        dispatch(new CloseOrder($order, config('app.seckill_order_ttl')));
+
+        return $order;
+    }
 }

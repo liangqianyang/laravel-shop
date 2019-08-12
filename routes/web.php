@@ -15,7 +15,7 @@ Route::redirect('/', '/products')->name('root');
 Route::get('products', 'ProductsController@index')->name('products.index');//商品列表页
 
 Auth::routes();//登陆,注册
-
+Route::post('seckill_orders', 'OrdersController@seckill')->name('seckill_orders.store')->middleware('random_drop:100');
 // auth 中间件代表需要登录，verified中间件代表需要经过邮箱验证
 Route::group(['middleware' => ['auth']], function () {
     Route::get('user_addresses', 'UserAddressesController@index')->name('user_addresses.index');
