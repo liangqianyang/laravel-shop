@@ -123,7 +123,8 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
-    'order_ttl' => 1800,
+    'order_ttl' => 1800,//普通商品
+    'seckill_order_ttl' => 600,//秒杀商品
 
     'installment_fee_rate' => [
         3  => 1.5,
