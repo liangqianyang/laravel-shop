@@ -376,6 +376,7 @@
             @if($product->type == \App\Models\Product::TYPE_SECKILL && $product->seckill->is_before_start)
             // 将秒杀开始时间转成一个 moment 对象
             var startTime = moment.unix({{ $product->seckill->start_at->getTimestamp() }});
+
             // 设定一个定时器
             var hdl = setInterval(function () {
                 // 获取当前时间
@@ -427,9 +428,11 @@
                     if (!ret) {
                         return;
                     }
-                    // 构建请求参数
+                    // 从地址列表中找出当前用户选择的地址对象
+                    var address = _.find(addresses, {id: parseInt(addressSelector.val())});
                     var req = {
-                        address_id: addressSelector.val(),
+                        // 将地址对象中的字段放入 address 参数
+                        address: _.pick(address, ['province','city','district','address','zip','contact_name','contact_phone']),
                         sku_id: $('label.active input[name=skus]').val()
                     };
                     // 调用秒杀商品下单接口

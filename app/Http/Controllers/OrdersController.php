@@ -210,6 +210,7 @@ class OrdersController extends Controller
         return $orderService->crowdfunding($user, $address, $sku, $amount);
     }
 
+
     /**
      * 秒杀
      * @param SeckillOrderRequest $request
@@ -219,10 +220,9 @@ class OrdersController extends Controller
      */
     public function seckill(SeckillOrderRequest $request, OrderService $orderService)
     {
-        $user    = $request->user();
-        $address = UserAddress::find($request->input('address_id'));
-        $sku     = ProductSku::find($request->input('sku_id'));
+        $user = $request->user();
+        $sku  = ProductSku::find($request->input('sku_id'));
 
-        return $orderService->seckill($user, $address, $sku);
+        return $orderService->seckill($user, $request->input('address'), $sku);
     }
 }
